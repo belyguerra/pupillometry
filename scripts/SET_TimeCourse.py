@@ -248,8 +248,6 @@ def combineTimeBuckets(filelines, new_columns):
         num_buckets_passed += 1
         avgForBin = np.mean(sameTimePupils)
         prevRow[colRemoveTrials] = str(avgForBin)
-        # prevRow[colDiameterPupilRightEye] = str(avgForBin)
-        # prevRow[colDiameterPupilLeftEye] = str(avgForBin)
         filelines_new.append(prevRow)
         new_window_list.append(prevWindow)
         new_normalized_time_list.append(prevTime)
@@ -268,7 +266,6 @@ def combineTimeBuckets(filelines, new_columns):
             for x in range(num_buckets_passed):
                 new_pupil_rolling_avg_list.append('NA')
 
-    # print 'TEST len(new_window_list): %d, len(new_pupil_rolling_avg_list): %d' % (len(new_window_list), len(new_pupil_rolling_avg_list))
     return filelines_new, new_window_list, new_normalized_time_list, new_pupil_rolling_avg_list
 
 #Defines the new names of the stimuli seen by subjects (e.g. first item, first fixation, etc)
@@ -382,13 +379,6 @@ for f in glob.glob(filepath + '/*.csv'):
         continue
 
     new_cols = {}
-    #cretea a new column with the stimuli that corresponds to pupil dilation timing
-    #dfTemp['Window'] = None
-    #dfTemp['TrialBaseline'] = None
-    #dfTemp['TEPR'] = None
-    #dfTemp['TEPR_fix'] = None
-    #dfTemp['IEPR'] = None
-    #dfTemp['WindowTimeNormalized'] = None
 
     #initializing values
     prevCurrentObject = ''
@@ -692,45 +682,6 @@ for f in glob.glob(filepath + '/*.csv'):
                 trialDataMap[trialId]['TEPR_Fix2Fix3avg'] = total / count
             else:
                 trialDataMap[trialId]['TEPR_Fix2Fix3avg'] = 'NA';
-
-    ##calc stats for bias
-    ## this needs to be revisited
-    bias = 'NoBias'
-    # if len(biasMap['SET']) == 0 or len(biasMap['noSET']) == 0:
-    #     bias = 'NoBias'
-    # else:
-    #     avgSet = np.mean(biasMap['SET'])
-    #     avgNoSet = np.mean(biasMap['noSET'])
-
-    #     T,p = scipy.stats.wilcoxon(biasMap['SET'], biasMap['noSET'])
-    #     bias = 'NoBias'
-    #     if p < 0.05:
-    #         if avgSet > avgNoSet:
-    #             bias = 'Consistency'
-    #         elif avgSet < avgNoSet:
-    #             bias = 'Inconsistency'
-
-    ##calc stats for encoding strategy
-    ## this needs to be revisited
-    encodingStrategy = 'Neither'
-    # if len(encodingStrategyMap['span1 or span2']) == 0 or len(encodingStrategyMap['span3']) == 0:
-    #     encodingStrategy = 'Neither'
-    # else:
-    #     avgSpan12 = np.mean(encodingStrategyMap['span1 or span2'])
-    #     avgSpan3 = np.mean(encodingStrategyMap['span3'])
-    #     T, p = scipy.stats.wilcoxon(encodingStrategyMap['span1 or span2'], encodingStrategyMap['span3'])
-    #     encodingStrategy = 'Neither'
-    #     if p < 0.05:
-    #         if avgSpan12 > avgSpan3:
-    #             encodingStrategy = 'RelationEncoding'
-    #         elif avgSpan12 < avgSpan3:
-    #             encodingStrategy = 'ItemEncoding'
-
-    ### now set values for each trial
-    for trialId in windowmap.keys():
-        if trialId in trialDataMap:
-            trialDataMap[trialId]['Bias'] = bias
-            trialDataMap[trialId]['EncodingStrategy'] = encodingStrategy
 
     print 'DONE PASS 3!'
 
