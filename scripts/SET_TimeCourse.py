@@ -32,7 +32,7 @@ WINDOW_SIZE = 100
 
 #Set file path where the subject data is located (I use the first path for testing, so do not erase)
 #filepath = 'C:\\Users\\belyguerra\\Documents\\ReasoningTraining\\SET\\test'
-filepath = '/home/bunge/bguerra/EyeTracking/SET/data/raw/T1/Filtered_and_interpolated_files/trials_removed/'
+filepath = '/home/bunge/bguerra/CNS2017/SET/T1/trials_removed/'
 ########################################################################################################
 
 
@@ -47,23 +47,23 @@ all_lines = []
 new_headers = ['Window', 'PupilAvg', 'PupilAvgRoll', 'TrialBaseline', 'TEPR', 'TEPR_fix', 'IEPR', 'WindowTimeNormalized']
 
 #The columns we will be reading from the input data files
-colSubject = 2
-colTETTime = 5
-colDiameterPupilLeftEye = 15
-colValidityLeftEye = 17
-colDiameterPupilRightEye = 22
-colValidityRightEye = 24
-colTrialId = 25
-colACC = 28
-colRT = 29
-colCategory = 30
-colSETornoSET = 31
-colTrainorExp = 32
-colPosition_false_shape = 33
-colCurrentObject = 40
-colInterpPupil = 41 #Pupil data: filtered and interpolated
-colFilteredPupil = 42
-colRemoveTrials = 43 #Pupil data: filtered, interpolated, and NAs in trials with less than 50% valid data
+colSubject = 1
+colTETTime = 4
+colDiameterPupilLeftEye = 14
+colValidityLeftEye = 16
+colDiameterPupilRightEye = 21
+colValidityRightEye = 23
+colTrialId = 24
+colACC = 27
+colRT = 28
+colCategory = 29
+colSETornoSET = 30
+colTrainorExp = 31
+colPosition_false_shape = 32
+colCurrentObject = 39
+colInterpPupil = 40 #Pupil data: filtered and interpolated
+colFilteredPupil = 41
+colRemoveTrials = 42 #Pupil data: filtered, interpolated, and NAs in trials with less than 50% valid data
 
 #Dictionary that has placeholders we can use to later separate fixation vs item presentation stages
 #The keys are the value of the CurrentObject window, and we are just setting them equal to a number
@@ -248,6 +248,8 @@ def combineTimeBuckets(filelines, new_columns):
         num_buckets_passed += 1
         avgForBin = np.mean(sameTimePupils)
         prevRow[colRemoveTrials] = str(avgForBin)
+        # prevRow[colDiameterPupilRightEye] = str(avgForBin)
+        # prevRow[colDiameterPupilLeftEye] = str(avgForBin)
         filelines_new.append(prevRow)
         new_window_list.append(prevWindow)
         new_normalized_time_list.append(prevTime)
@@ -266,6 +268,7 @@ def combineTimeBuckets(filelines, new_columns):
             for x in range(num_buckets_passed):
                 new_pupil_rolling_avg_list.append('NA')
 
+    # print 'TEST len(new_window_list): %d, len(new_pupil_rolling_avg_list): %d' % (len(new_window_list), len(new_pupil_rolling_avg_list))
     return filelines_new, new_window_list, new_normalized_time_list, new_pupil_rolling_avg_list
 
 #Defines the new names of the stimuli seen by subjects (e.g. first item, first fixation, etc)
@@ -340,18 +343,18 @@ def calcWindowNames(filelines, new_columns):
 
 # main starts here
 ### glob is slow!!! ###
-for f in glob.glob(filepath + '/*.csv'):
+for f in glob.glob(filepath + '/*.tsv'):
     filename = os.path.basename(f)
     print 'processing file:', filename
 
     filelines = []
-    with open(f, 'r') as csvfile:
+    with open(f, 'r') as tsvfile:
         first = True
-        for line in csvfile:
+        for line in tsvfile:
             if first:
                 first = False
                 if len(headers) == 0:
-                    headers_data = line.strip().split(',')
+                    headers_data = line.rstrip('\r\n').split('\t')
 
                     for h in headers_data:
 
@@ -361,24 +364,31 @@ for f in glob.glob(filepath + '/*.csv'):
                             headers.append(h)
                 continue
 
-            data_temp = line.strip().split(',')
+            data_temp = line.rstrip('\r\n').split('\t')
 
-            if len(data_temp) < 44:
+            #this is to check that we read the right number of columns from the file
+            if len(data_temp) < 43:
                 continue
-
+                
             data = []
             for d in data_temp:
                 if d[0] == '"' and d[-1] == '"':
                     data.append(d[1:-1])
                 else:
                     data.append(d)
-
             filelines.append(data)
-
+            
     if len(filelines) == 0:
         continue
 
     new_cols = {}
+    #cretea a new column with the stimuli that corresponds to pupil dilation timing
+    #dfTemp['Window'] = None
+    #dfTemp['TrialBaseline'] = None
+    #dfTemp['TEPR'] = None
+    #dfTemp['TEPR_fix'] = None
+    #dfTemp['IEPR'] = None
+    #dfTemp['WindowTimeNormalized'] = None
 
     #initializing values
     prevCurrentObject = ''
@@ -683,6 +693,45 @@ for f in glob.glob(filepath + '/*.csv'):
             else:
                 trialDataMap[trialId]['TEPR_Fix2Fix3avg'] = 'NA';
 
+    ##calc stats for bias
+    ## this needs to be revisited
+    bias = 'NoBias'
+    # if len(biasMap['SET']) == 0 or len(biasMap['noSET']) == 0:
+    #     bias = 'NoBias'
+    # else:
+    #     avgSet = np.mean(biasMap['SET'])
+    #     avgNoSet = np.mean(biasMap['noSET'])
+
+    #     T,p = scipy.stats.wilcoxon(biasMap['SET'], biasMap['noSET'])
+    #     bias = 'NoBias'
+    #     if p < 0.05:
+    #         if avgSet > avgNoSet:
+    #             bias = 'Consistency'
+    #         elif avgSet < avgNoSet:
+    #             bias = 'Inconsistency'
+
+    ##calc stats for encoding strategy
+    ## this needs to be revisited
+    encodingStrategy = 'Neither'
+    # if len(encodingStrategyMap['span1 or span2']) == 0 or len(encodingStrategyMap['span3']) == 0:
+    #     encodingStrategy = 'Neither'
+    # else:
+    #     avgSpan12 = np.mean(encodingStrategyMap['span1 or span2'])
+    #     avgSpan3 = np.mean(encodingStrategyMap['span3'])
+    #     T, p = scipy.stats.wilcoxon(encodingStrategyMap['span1 or span2'], encodingStrategyMap['span3'])
+    #     encodingStrategy = 'Neither'
+    #     if p < 0.05:
+    #         if avgSpan12 > avgSpan3:
+    #             encodingStrategy = 'RelationEncoding'
+    #         elif avgSpan12 < avgSpan3:
+    #             encodingStrategy = 'ItemEncoding'
+
+    ### now set values for each trial
+    for trialId in windowmap.keys():
+        if trialId in trialDataMap:
+            trialDataMap[trialId]['Bias'] = bias
+            trialDataMap[trialId]['EncodingStrategy'] = encodingStrategy
+
     print 'DONE PASS 3!'
 
     ##pass 4 used to set new column values based on baseline and fix maps
@@ -779,7 +828,7 @@ for f in glob.glob(filepath + '/*.csv'):
         for new_header in new_headers:
             data_in_row += [str(new_cols[row_number][new_header])]
 
-        all_lines.append(','.join(data_in_row))
+        all_lines.append("\t".join(data_in_row))
 
     #append summary data
     tempSummaryDF = pd.DataFrame(trialDataMap.values())
@@ -787,7 +836,7 @@ for f in glob.glob(filepath + '/*.csv'):
 
     print 'DONE!!!'
 
-### print out csv###
+### print out file###
 
 ###filter out columns we don't want in headers ###
 cnt = 0
@@ -800,13 +849,13 @@ headers = temp_headers
 ### add new headers
 headers += new_headers
 
-with open('SET_PupilTS_LSAT_T1.csv', 'w') as csvfile:
+with open('/home/bunge/bguerra/CNS2017/SET/Results/SET_PupilTS_LSAT_T1.tsv', 'w') as tsvfile:
     ### write headers
-    csvfile.write('%s\n' % ','.join(headers))
+    tsvfile.write('%s\n' % "\t".join(headers))
     for line in all_lines:
-        csvfile.write('%s\n' % line)
+        tsvfile.write('%s\n' % line)
 
-dfSUMMARY.to_csv('SET_PupilAvg_LSAT_T1.csv')
+dfSUMMARY.to_csv('/home/bunge/bguerra/CNS2017/SET/Results/SET_PupilAvg_LSAT_T1.tsv', sep='\t')
 
 print 'REALLY DONE'
 ########################################################################################################
