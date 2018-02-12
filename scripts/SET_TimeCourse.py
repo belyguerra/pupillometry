@@ -369,7 +369,7 @@ for f in glob.glob(filepath + '/*.tsv'):
             #this is to check that we read the right number of columns from the file
             if len(data_temp) < 43:
                 continue
-                
+
             data = []
             for d in data_temp:
                 if d[0] == '"' and d[-1] == '"':
@@ -377,7 +377,7 @@ for f in glob.glob(filepath + '/*.tsv'):
                 else:
                     data.append(d)
             filelines.append(data)
-            
+
     if len(filelines) == 0:
         continue
 
@@ -693,45 +693,6 @@ for f in glob.glob(filepath + '/*.tsv'):
             else:
                 trialDataMap[trialId]['TEPR_Fix2Fix3avg'] = 'NA';
 
-    ##calc stats for bias
-    ## this needs to be revisited
-    bias = 'NoBias'
-    # if len(biasMap['SET']) == 0 or len(biasMap['noSET']) == 0:
-    #     bias = 'NoBias'
-    # else:
-    #     avgSet = np.mean(biasMap['SET'])
-    #     avgNoSet = np.mean(biasMap['noSET'])
-
-    #     T,p = scipy.stats.wilcoxon(biasMap['SET'], biasMap['noSET'])
-    #     bias = 'NoBias'
-    #     if p < 0.05:
-    #         if avgSet > avgNoSet:
-    #             bias = 'Consistency'
-    #         elif avgSet < avgNoSet:
-    #             bias = 'Inconsistency'
-
-    ##calc stats for encoding strategy
-    ## this needs to be revisited
-    encodingStrategy = 'Neither'
-    # if len(encodingStrategyMap['span1 or span2']) == 0 or len(encodingStrategyMap['span3']) == 0:
-    #     encodingStrategy = 'Neither'
-    # else:
-    #     avgSpan12 = np.mean(encodingStrategyMap['span1 or span2'])
-    #     avgSpan3 = np.mean(encodingStrategyMap['span3'])
-    #     T, p = scipy.stats.wilcoxon(encodingStrategyMap['span1 or span2'], encodingStrategyMap['span3'])
-    #     encodingStrategy = 'Neither'
-    #     if p < 0.05:
-    #         if avgSpan12 > avgSpan3:
-    #             encodingStrategy = 'RelationEncoding'
-    #         elif avgSpan12 < avgSpan3:
-    #             encodingStrategy = 'ItemEncoding'
-
-    ### now set values for each trial
-    for trialId in windowmap.keys():
-        if trialId in trialDataMap:
-            trialDataMap[trialId]['Bias'] = bias
-            trialDataMap[trialId]['EncodingStrategy'] = encodingStrategy
-
     print 'DONE PASS 3!'
 
     ##pass 4 used to set new column values based on baseline and fix maps
@@ -849,13 +810,13 @@ headers = temp_headers
 ### add new headers
 headers += new_headers
 
-with open('/home/bunge/bguerra/CNS2017/SET/Results/SET_PupilTS_LSAT_T1.tsv', 'w') as tsvfile:
+with open('/home/bunge/bguerra/EyeTracking/SET/ms/SET_PupilTS_LSAT_T1.tsv', 'w') as tsvfile:
     ### write headers
     tsvfile.write('%s\n' % "\t".join(headers))
     for line in all_lines:
         tsvfile.write('%s\n' % line)
 
-dfSUMMARY.to_csv('/home/bunge/bguerra/CNS2017/SET/Results/SET_PupilAvg_LSAT_T1.tsv', sep='\t')
+dfSUMMARY.to_csv('/home/bunge/bguerra/EyeTracking/SET/ms/SET_PupilAvg_LSAT_T1.tsv', sep='\t')
 
 print 'REALLY DONE'
 ########################################################################################################
