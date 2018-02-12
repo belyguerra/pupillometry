@@ -32,7 +32,7 @@ WINDOW_SIZE = 100
 
 #Set file path where the subject data is located (I use the first path for testing, so do not erase)
 #filepath = 'C:\\Users\\belyguerra\\Documents\\ReasoningTraining\\SET\\test'
-filepath = '/home/bunge/bguerra/CNS2017/SET/T1/trials_removed/'
+filepath = '/home/bunge/bguerra/CNS2017/SET/T2/trials_removed/'
 ########################################################################################################
 
 
@@ -810,13 +810,13 @@ headers = temp_headers
 ### add new headers
 headers += new_headers
 
-with open('/home/bunge/bguerra/EyeTracking/SET/ms/SET_PupilTS_LSAT_T1.tsv', 'w') as tsvfile:
+with open('/home/bunge/bguerra/EyeTracking/SET/ms/SET_PupilTS_LSAT_T2.tsv', 'w') as tsvfile:
     ### write headers
     tsvfile.write('%s\n' % "\t".join(headers))
     for line in all_lines:
         tsvfile.write('%s\n' % line)
 
-dfSUMMARY.to_csv('/home/bunge/bguerra/EyeTracking/SET/ms/SET_PupilAvg_LSAT_T1.tsv', sep='\t')
+dfSUMMARY.to_csv('/home/bunge/bguerra/EyeTracking/SET/ms/SET_PupilAvg_LSAT_T2.tsv', sep='\t')
 
 print 'REALLY DONE'
 ########################################################################################################
